@@ -1,0 +1,625 @@
+{
+  "hdrIrradianceMax": 4.0,
+  "bakedChunks": [
+    "Chunk_Exterior_Facade",
+    "Chunk_Core_Structure",
+    "Chunk_Central_Hall",
+    "Chunk_Study_Room",
+    "Chunk_Middle_Bedroom",
+    "Chunk_Kitchen_Bath",
+    "Chunk_Tanka_Courtyard",
+    "Chunk_Ceilings_POP",
+    "Chunk_Roof_Terrace",
+    "Chunk_Environment_Ground"
+  ],
+  "cutawayChunks": [
+    "Chunk_Roof_Terrace",
+    "Chunk_Ceilings_POP"
+  ],
+  "foliageChunks": [
+    "Chunk_Foliage"
+  ],
+  "waterNode": "Tanka_Water_Surface",
+  "tvNode": "Interactive_TV_Screen",
+  "fans": [
+    {
+      "id": "Fan_Study",
+      "label": "Study Room Fan",
+      "position": [
+        1.425,
+        3.17,
+        -4.385
+      ]
+    },
+    {
+      "id": "Fan_Hall",
+      "label": "Central Hall Fan",
+      "position": [
+        2.8,
+        3.32,
+        -9.0
+      ]
+    },
+    {
+      "id": "Fan_Kitchen",
+      "label": "Kitchen Fan",
+      "position": [
+        4.3,
+        3.32,
+        -13.3
+      ]
+    },
+    {
+      "id": "Fan_MidBed",
+      "label": "Bedroom Fan",
+      "position": [
+        0.55,
+        3.32,
+        -13.3
+      ]
+    }
+  ],
+  "roomLights": [
+    {
+      "id": "porch",
+      "label": "Front Porch & Eaves",
+      "pos": [
+        2.2,
+        3.2,
+        -1.0
+      ],
+      "color": "#ffbc75",
+      "intensity": 1.4,
+      "distance": 9.0
+    },
+    {
+      "id": "study",
+      "label": "Front Study Room",
+      "pos": [
+        1.3,
+        3.15,
+        -4.4
+      ],
+      "color": "#ffd29b",
+      "intensity": 1.6,
+      "distance": 8.0
+    },
+    {
+      "id": "hall",
+      "label": "Central Living Hall",
+      "pos": [
+        3.1,
+        3.25,
+        -8.9
+      ],
+      "color": "#ffd49e",
+      "intensity": 2.0,
+      "distance": 10.0
+    },
+    {
+      "id": "midbed",
+      "label": "Middle Bedroom",
+      "pos": [
+        0.7,
+        3.15,
+        -13.3
+      ],
+      "color": "#ffcb8e",
+      "intensity": 1.6,
+      "distance": 8.0
+    },
+    {
+      "id": "kitchen",
+      "label": "Granite Kitchen",
+      "pos": [
+        4.4,
+        3.15,
+        -13.3
+      ],
+      "color": "#ffebd0",
+      "intensity": 1.8,
+      "distance": 8.0
+    },
+    {
+      "id": "bath",
+      "label": "Marble Bathroom",
+      "pos": [
+        -0.65,
+        2.5,
+        -9.5
+      ],
+      "color": "#ffe6c4",
+      "intensity": 1.3,
+      "distance": 6.0
+    },
+    {
+      "id": "tanka",
+      "label": "Tanka Courtyard",
+      "pos": [
+        -3.8,
+        3.2,
+        -9.5
+      ],
+      "color": "#ffc682",
+      "intensity": 1.8,
+      "distance": 11.0
+    },
+    {
+      "id": "terrace",
+      "label": "Roof Terrace",
+      "pos": [
+        1.0,
+        5.2,
+        -7.5
+      ],
+      "color": "#ffbe73",
+      "intensity": 1.6,
+      "distance": 14.0
+    }
+  ],
+  "rooms": [
+    {
+      "id": "exterior",
+      "name": "Jodhpur Facade",
+      "subtitle": "Carved pink sandstone, jharokha & front courtyard",
+      "pos": [
+        2.6,
+        1.85,
+        5.6
+      ],
+      "target": [
+        0.8,
+        1.8,
+        -2.0
+      ],
+      "floorY": 0.0,
+      "indoor": false
+    },
+    {
+      "id": "carport",
+      "name": "Carport & Rangoli",
+      "subtitle": "Shaded entrance, floral rangoli & motorcycle bay",
+      "pos": [
+        -3.3,
+        1.65,
+        1.8
+      ],
+      "target": [
+        -2.8,
+        1.3,
+        -2.5
+      ],
+      "floorY": 0.18,
+      "indoor": false
+    },
+    {
+      "id": "study",
+      "name": "Front Study & Piano",
+      "subtitle": "61-key keyboard, Ghibli gallery wall & teak bed",
+      "pos": [
+        2.1,
+        1.97,
+        -2.9
+      ],
+      "target": [
+        0.2,
+        1.45,
+        -5.4
+      ],
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "id": "entry",
+      "name": "Entry & Stairwell",
+      "subtitle": "Carved teak double doors & terrazzo staircase",
+      "pos": [
+        4.35,
+        1.97,
+        -3.1
+      ],
+      "target": [
+        4.35,
+        1.65,
+        -7.8
+      ],
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "id": "hall",
+      "name": "Central Living Hall",
+      "subtitle": "Carved teak sofas, 7 Horses art & white marble floor",
+      "pos": [
+        3.1,
+        1.97,
+        -7.3
+      ],
+      "target": [
+        3.1,
+        1.55,
+        -11.2
+      ],
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "id": "midbed",
+      "name": "Middle Bedroom",
+      "subtitle": "Home shrine, wardrobes & floral linen suite",
+      "pos": [
+        0.8,
+        1.97,
+        -12.1
+      ],
+      "target": [
+        0.5,
+        1.45,
+        -14.8
+      ],
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "id": "kitchen",
+      "name": "Granite Kitchen",
+      "subtitle": "Polished black granite counters & sunny window",
+      "pos": [
+        3.5,
+        1.97,
+        -12.1
+      ],
+      "target": [
+        5.3,
+        1.35,
+        -14.3
+      ],
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "id": "bathroom",
+      "name": "Marble Bath",
+      "subtitle": "Black-gold veined marble & chrome fixtures",
+      "pos": [
+        -0.6,
+        1.95,
+        -8.2
+      ],
+      "target": [
+        -0.7,
+        1.45,
+        -10.6
+      ],
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "id": "tanka",
+      "name": "Tanka Courtyard",
+      "subtitle": "Traditional mosaic water pit, charpai & desert cooler",
+      "pos": [
+        -3.8,
+        1.97,
+        -4.0
+      ],
+      "target": [
+        -4.0,
+        1.4,
+        -11.5
+      ],
+      "floorY": 0.45,
+      "indoor": false
+    },
+    {
+      "id": "terrace",
+      "name": "Roof Terrace",
+      "subtitle": "Swastika sandstone jali parapet & neighborhood vista",
+      "pos": [
+        -2.2,
+        5.38,
+        -2.2
+      ],
+      "target": [
+        2.2,
+        4.35,
+        -11.2
+      ],
+      "floorY": 3.85,
+      "indoor": false
+    }
+  ],
+  "walkZones": [
+    {
+      "name": "Exterior Yard",
+      "minX": -14.0,
+      "maxX": 14.0,
+      "minZ": -0.2,
+      "maxZ": 12.0,
+      "floorY": 0.0,
+      "indoor": false
+    },
+    {
+      "name": "Front Porch",
+      "minX": -6.4,
+      "maxX": 6.5,
+      "minZ": -2.2,
+      "maxZ": 0.1,
+      "floorY": 0.18,
+      "indoor": false
+    },
+    {
+      "name": "Study Room",
+      "minX": -0.7,
+      "maxX": 3.2,
+      "minZ": -6.5,
+      "maxZ": -2.2,
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "name": "Entry Hallway",
+      "minX": 3.7,
+      "maxX": 5.1,
+      "minZ": -6.6,
+      "maxZ": -2.2,
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "name": "Central Hall",
+      "minX": 0.1,
+      "maxX": 6.3,
+      "minZ": -11.4,
+      "maxZ": -6.5,
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "name": "West Corridor",
+      "minX": -1.3,
+      "maxX": 0.2,
+      "minZ": -11.5,
+      "maxZ": -6.5,
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "name": "Middle Bedroom",
+      "minX": -1.2,
+      "maxX": 2.3,
+      "minZ": -15.0,
+      "maxZ": -11.4,
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "name": "Kitchen",
+      "minX": 2.3,
+      "maxX": 6.3,
+      "minZ": -15.0,
+      "maxZ": -11.4,
+      "floorY": 0.45,
+      "indoor": true
+    },
+    {
+      "name": "Tanka Courtyard",
+      "minX": -6.3,
+      "maxX": -1.4,
+      "minZ": -15.1,
+      "maxZ": -2.2,
+      "floorY": 0.45,
+      "indoor": false
+    },
+    {
+      "name": "Roof Terrace",
+      "minX": -6.2,
+      "maxX": 6.2,
+      "minZ": -14.8,
+      "maxZ": -0.4,
+      "floorY": 3.85,
+      "indoor": false
+    }
+  ],
+  "stairRamps": [
+    {
+      "name": "StairF1",
+      "minX": 5.03,
+      "maxX": 6.38,
+      "minZ": -6.25,
+      "maxZ": -3.3,
+      "startZ": -6.25,
+      "startY": 0.45,
+      "endZ": -3.3,
+      "endY": 2.02
+    },
+    {
+      "name": "StairMidLanding",
+      "minX": 3.7,
+      "maxX": 6.38,
+      "minZ": -3.35,
+      "maxZ": -2.2,
+      "startZ": -3.35,
+      "startY": 2.02,
+      "endZ": -2.2,
+      "endY": 2.02
+    },
+    {
+      "name": "StairF2",
+      "minX": 3.7,
+      "maxX": 5.04,
+      "minZ": -5.95,
+      "maxZ": -3.3,
+      "startZ": -3.3,
+      "startY": 2.02,
+      "endZ": -5.95,
+      "endY": 3.85
+    }
+  ],
+  "tourWaypoints": [
+    {
+      "pos": [
+        4.2,
+        2.2,
+        7.2
+      ],
+      "target": [
+        0.5,
+        1.8,
+        -2.0
+      ],
+      "room": "Jodhpur Sandstone Facade",
+      "caption": "Hand-carved red sandstone facade bathed in golden-hour light"
+    },
+    {
+      "pos": [
+        -2.2,
+        1.75,
+        3.5
+      ],
+      "target": [
+        -3.2,
+        1.25,
+        -2.2
+      ],
+      "room": "Carport & Rangoli",
+      "caption": "Traditional rangoli & shaded front veranda"
+    },
+    {
+      "pos": [
+        2.2,
+        1.85,
+        -0.9
+      ],
+      "target": [
+        1.8,
+        1.55,
+        -4.5
+      ],
+      "room": "Porch Entryway",
+      "caption": "Stepping across black granite plinths into the study"
+    },
+    {
+      "pos": [
+        2.0,
+        1.92,
+        -3.2
+      ],
+      "target": [
+        0.0,
+        1.35,
+        -5.2
+      ],
+      "room": "Front Study Room",
+      "caption": "61-key piano, desk setup & Studio Ghibli wall"
+    },
+    {
+      "pos": [
+        4.35,
+        1.95,
+        -4.4
+      ],
+      "target": [
+        3.2,
+        1.55,
+        -9.2
+      ],
+      "room": "Entry Hallway",
+      "caption": "Leading into the heart of the home"
+    },
+    {
+      "pos": [
+        3.1,
+        1.95,
+        -7.2
+      ],
+      "target": [
+        3.1,
+        1.5,
+        -11.2
+      ],
+      "room": "Central Living Hall",
+      "caption": "Carved teak seating, 7 Horses painting & veined marble"
+    },
+    {
+      "pos": [
+        1.0,
+        1.95,
+        -12.1
+      ],
+      "target": [
+        0.4,
+        1.45,
+        -14.8
+      ],
+      "room": "Middle Bedroom",
+      "caption": "Calm bedroom sanctuary with home shrine"
+    },
+    {
+      "pos": [
+        3.3,
+        1.95,
+        -12.2
+      ],
+      "target": [
+        5.5,
+        1.35,
+        -14.2
+      ],
+      "room": "Granite Kitchen",
+      "caption": "Polished black granite counters & sunlit window"
+    },
+    {
+      "pos": [
+        -3.6,
+        1.95,
+        -12.0
+      ],
+      "target": [
+        -3.9,
+        1.25,
+        -6.0
+      ],
+      "room": "Tanka Courtyard",
+      "caption": "Open-sky courtyard with mosaic tanka pit & charpai"
+    },
+    {
+      "pos": [
+        -2.2,
+        5.35,
+        -2.5
+      ],
+      "target": [
+        2.4,
+        4.35,
+        -11.2
+      ],
+      "room": "Roof Terrace",
+      "caption": "Panoramic terrace framed by carved sandstone jali"
+    }
+  ],
+  "dollhouseView": {
+    "pos": [
+      12.5,
+      15.5,
+      10.5
+    ],
+    "target": [
+      0.0,
+      1.2,
+      -7.5
+    ]
+  },
+  "bounds": {
+    "min": [
+      -7.0,
+      0.0,
+      4.0
+    ],
+    "max": [
+      7.5,
+      7.0,
+      -16.5
+    ]
+  }
+}

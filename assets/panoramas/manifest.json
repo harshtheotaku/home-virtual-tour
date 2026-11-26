@@ -1,0 +1,240 @@
+{
+  "resolution": [
+    4096,
+    2048
+  ],
+  "rooms": [
+    {
+      "id": "exterior",
+      "name": "Jodhpur Facade",
+      "subtitle": "Carved pink sandstone, jharokha & front courtyard",
+      "pos": [
+        1.8,
+        1.85,
+        4.6
+      ],
+      "target": [
+        1.0,
+        1.8,
+        -2.0
+      ],
+      "indoor": false,
+      "neighbors": [
+        "carport",
+        "study",
+        "entry"
+      ],
+      "dayUrl": "/assets/panoramas/day/exterior.webp?v=4k1",
+      "nightUrl": "/assets/panoramas/night/exterior.webp?v=4k1"
+    },
+    {
+      "id": "carport",
+      "name": "Carport & Rangoli",
+      "subtitle": "Shaded entrance, floral rangoli & motorcycle bay",
+      "pos": [
+        -3.2,
+        1.7,
+        1.2
+      ],
+      "target": [
+        -2.8,
+        1.35,
+        -2.5
+      ],
+      "indoor": false,
+      "neighbors": [
+        "exterior",
+        "tanka",
+        "study"
+      ],
+      "dayUrl": "/assets/panoramas/day/carport.webp?v=4k1",
+      "nightUrl": "/assets/panoramas/night/carport.webp?v=4k1"
+    },
+    {
+      "id": "study",
+      "name": "Front Study & Piano",
+      "subtitle": "61-key keyboard, Ghibli gallery wall & teak bed",
+      "pos": [
+        1.35,
+        1.92,
+        -4.3
+      ],
+      "target": [
+        -0.4,
+        1.45,
+        -4.5
+      ],
+      "indoor": true,
+      "neighbors": [
+        "exterior",
+        "entry",
+        "hall"
+      ],
+      "dayUrl": "/assets/panoramas/day/study.webp?v=4k1",
+      "nightUrl": "/assets/panoramas/night/study.webp?v=4k1"
+    },
+    {
+      "id": "entry",
+      "name": "Entry & Stairwell",
+      "subtitle": "Carved teak double doors & terrazzo staircase",
+      "pos": [
+        4.35,
+        1.95,
+        -4.3
+      ],
+      "target": [
+        3.8,
+        1.55,
+        -8.2
+      ],
+      "indoor": true,
+      "neighbors": [
+        "exterior",
+        "study",
+        "hall",
+        "terrace"
+      ],
+      "dayUrl": "/assets/panoramas/day/entry.webp?v=4k1",
+      "nightUrl": "/assets/panoramas/night/entry.webp?v=4k1"
+    },
+    {
+      "id": "hall",
+      "name": "Central Living Hall",
+      "subtitle": "Carved teak sofas, 7 Horses art & veined marble floor",
+      "pos": [
+        3.1,
+        1.95,
+        -8.9
+      ],
+      "target": [
+        0.8,
+        1.55,
+        -8.9
+      ],
+      "indoor": true,
+      "neighbors": [
+        "entry",
+        "study",
+        "midbed",
+        "kitchen",
+        "bathroom",
+        "tanka"
+      ],
+      "dayUrl": "/assets/panoramas/day/hall.webp?v=4k1",
+      "nightUrl": "/assets/panoramas/night/hall.webp?v=4k1"
+    },
+    {
+      "id": "midbed",
+      "name": "Middle Bedroom",
+      "subtitle": "Home shrine, wardrobes & floral linen suite",
+      "pos": [
+        0.65,
+        1.95,
+        -13.0
+      ],
+      "target": [
+        0.4,
+        1.45,
+        -14.8
+      ],
+      "indoor": true,
+      "neighbors": [
+        "hall",
+        "kitchen",
+        "bathroom"
+      ],
+      "dayUrl": "/assets/panoramas/day/midbed.webp?v=4k1",
+      "nightUrl": "/assets/panoramas/night/midbed.webp?v=4k1"
+    },
+    {
+      "id": "kitchen",
+      "name": "Granite Kitchen",
+      "subtitle": "Polished black granite counters & sunny window",
+      "pos": [
+        4.1,
+        1.95,
+        -13.1
+      ],
+      "target": [
+        5.8,
+        1.35,
+        -13.8
+      ],
+      "indoor": true,
+      "neighbors": [
+        "hall",
+        "midbed"
+      ],
+      "dayUrl": "/assets/panoramas/day/kitchen.webp?v=4k1",
+      "nightUrl": "/assets/panoramas/night/kitchen.webp?v=4k1"
+    },
+    {
+      "id": "bathroom",
+      "name": "Marble Bath",
+      "subtitle": "Black-gold veined marble & chrome fixtures",
+      "pos": [
+        -0.65,
+        1.9,
+        -9.4
+      ],
+      "target": [
+        -0.65,
+        1.45,
+        -11.2
+      ],
+      "indoor": true,
+      "neighbors": [
+        "hall",
+        "midbed",
+        "tanka"
+      ],
+      "dayUrl": "/assets/panoramas/day/bathroom.webp?v=4k1",
+      "nightUrl": "/assets/panoramas/night/bathroom.webp?v=4k1"
+    },
+    {
+      "id": "tanka",
+      "name": "Tanka Courtyard",
+      "subtitle": "Traditional mosaic water pit, charpai & desert cooler",
+      "pos": [
+        -3.8,
+        1.95,
+        -7.2
+      ],
+      "target": [
+        -3.9,
+        1.35,
+        -12.2
+      ],
+      "indoor": false,
+      "neighbors": [
+        "carport",
+        "hall",
+        "bathroom"
+      ],
+      "dayUrl": "/assets/panoramas/day/tanka.webp?v=4k1",
+      "nightUrl": "/assets/panoramas/night/tanka.webp?v=4k1"
+    },
+    {
+      "id": "terrace",
+      "name": "Roof Terrace",
+      "subtitle": "Swastika sandstone jali parapet & neighborhood vista",
+      "pos": [
+        -1.2,
+        5.4,
+        -4.5
+      ],
+      "target": [
+        1.8,
+        4.4,
+        -11.0
+      ],
+      "indoor": false,
+      "neighbors": [
+        "entry",
+        "exterior"
+      ],
+      "dayUrl": "/assets/panoramas/day/terrace.webp?v=4k1",
+      "nightUrl": "/assets/panoramas/night/terrace.webp?v=4k1"
+    }
+  ]
+}
