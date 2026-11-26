@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#090b10" />
+<title>Apna Ghar · 360° Home Tour</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #090b10; color: #f5f5f4;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    user-select: none; -webkit-user-select: none; touch-action: none;
+  }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #fx { pointer-events: none; }
+  .vignette {
+    position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(circle at center, transparent 68%, rgba(4, 8, 22, 0.34) 100%);
+  }
+  .hud {
+    position: fixed; inset: 0; pointer-events: none; z-index: 10;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    transition: opacity .35s ease;
+  }
+  .hud.hidden-ui .hideable { opacity: 0; pointer-events: none !important; }
+  .top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .glass {
+    pointer-events: auto;
+    background: rgba(12, 11, 14, 0.62);
+    border: 1px solid rgba(251, 191, 36, 0.22);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-radius: 16px;
+  }
+  .title-card { padding: 9px 13px; max-width: 64vw; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 9px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+    color: #fcd34d;
+  }
+  .mood-pill {
+    background: rgba(255,255,255,0.12); color: #fef3c7; border-radius: 99px;
+    padding: 2px 7px; font-size: 9px; font-weight: 600; letter-spacing: .04em; text-transform: none;
+  }
+  .room-title { font-size: 15px; font-weight: 700; color: #fff; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .room-sub { font-size: 11px; color: #d6d3d1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .top-btns { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; pointer-events: auto; }
+  .btn {
+    pointer-events: auto; cursor: pointer; border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(12, 11, 14, 0.62); color: #f5f5f4;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px; padding: 8px 10px; font-size: 11px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 5px; transition: .18s ease;
+  }
+  .btn:active { transform: scale(0.95); }
+  .btn.active { background: rgba(251, 191, 36, 0.26); border-color: rgba(251, 191, 36, 0.58); color: #fef3c7; }
+  .bottom-col { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+  .controls-bar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px;
+    padding: 7px 11px; max-width: 100%;
+  }
+  .seg { display: inline-flex; gap: 4px; align-items: center; }
+  .pill {
+    cursor: pointer; border: none; border-radius: 10px; padding: 6px 10px;
+    font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.1); color: #e7e5e4;
+    transition: .16s ease;
+  }
+  .pill.on-day { background: #fbbf24; color: #1c1917; }
+  .pill.on-sunset { background: #fb923c; color: #1c1917; }
+  .pill.on-night { background: #818cf8; color: #0f172a; }
+  .pill.on-wx { background: #38bdf8; color: #0c4a6e; }
+  .slider-wrap { display: inline-flex; align-items: center; gap: 6px; padding: 0 2px; }
+  input[type=range] {
+    width: 112px; height: 5px; accent-color: #fbbf24; cursor: pointer;
+  }
+  @media (min-width: 640px) { input[type=range] { width: 155px; } }
+  .rooms-bar {
+    display: flex; align-items: center; gap: 5px;
+    overflow-x: auto; max-width: 100%; padding: 6px;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .rooms-bar::-webkit-scrollbar { display: none; }
+  .room-btn {
+    flex: 0 0 auto; cursor: pointer; border: none; border-radius: 10px;
+    padding: 7px 12px; font-size: 11px; font-weight: 600;
+    background: transparent; color: #e7e5e4; transition: .16s ease;
+  }
+  .room-btn.active { background: #fbbf24; color: #1c1917; box-shadow: 0 2px 10px rgba(251,191,36,0.35); }
+  .loader {
+    position: fixed; inset: 0; z-index: 25; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+    background: rgba(9, 11, 16, 0.82); pointer-events: none; transition: opacity .35s ease;
+  }
+  .loader.done { opacity: 0; }
+  .spinner {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 3px solid rgba(251,191,36,0.2); border-top-color: #fbbf24;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .hint {
+    font-size: 10px; color: rgba(255,255,255,0.68); text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <canvas id="gl"></canvas>
+  <canvas id="fx"></canvas>
+  <div class="vignette"></div>
+
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
+    <div id="loaderText" style="font-size:12px;font-weight:600;color:#fde68a;">Loading Apna Ghar 360°…</div>
+  </div>
+
+  <div id="hud" class="hud">
+    <!-- TOP ROW -->
+    <div class="top-row">
+      <div class="glass title-card hideable">
+        <div class="badge">
+          <span>✦ APNA GHAR 360°</span>
+          <span id="moodPill" class="mood-pill">Bright Day</span>
+        </div>
+        <div id="roomTitle" class="room-title">Jodhpur Facade</div>
+        <div id="roomSub" class="room-sub">Carved pink sandstone, jharokha &amp; courtyard</div>
+      </div>
+
+      <div class="top-btns">
+        <button id="btnLights" class="btn active hideable" title="House Lights Brightness">💡 Warm</button>
+        <button id="btnPan" class="btn hideable" title="Auto Rotate">🔄</button>
+        <button id="btnAudio" class="btn hideable" title="Ambient Nature Sound">🔇</button>
+        <button id="btnHide" class="btn" title="Hide / Show Buttons">👁️</button>
+      </div>
+    </div>
+
+    <!-- BOTTOM CONTROLS -->
+    <div class="bottom-col hideable">
+      <div class="glass controls-bar">
+        <div class="seg">
+          <button id="btnDay" class="pill on-day">☀️ Day</button>
+          <button id="btnSunset" class="pill">🌅 Sunset</button>
+          <button id="btnNight" class="pill">🌙 Night</button>
+        </div>
+
+        <div class="slider-wrap">
+          <span style="font-size:12px;">☀️</span>
+          <input id="nightSlider" type="range" min="0" max="1" step="0.01" value="0" aria-label="Day to Night" />
+          <span style="font-size:12px;">🌙</span>
+        </div>
+
+        <button id="btnTimelapse" class="pill">▶ Cycle</button>
+
+        <div class="seg">
+          <button id="wxClear" class="pill on-wx">Clear</button>
+          <button id="wxGolden" class="pill">Golden</button>
+          <button id="wxRain" class="pill">🌧️ Rain</button>
+        </div>
+      </div>
+
+      <div id="roomsBar" class="glass rooms-bar"></div>
+      <div class="hint">Drag to look 360° · Pinch or scroll to zoom · Tap rooms below</div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const ROOMS = [
+    { id: "exterior", name: "Jodhpur Facade",   sub: "Carved pink sandstone, jharokha & front courtyard", outdoor: true },
+    { id: "carport",  name: "Carport & Rangoli",sub: "Shaded veranda, floral rangoli & motorcycle bay",  outdoor: true },
+    { id: "study",    name: "Study & Piano",    sub: "61-key keyboard, Ghibli wall & teak bed",          outdoor: false },
+    { id: "entry",    name: "Entry & Stairs",   sub: "Carved teak doors & terrazzo staircase",           outdoor: false },
+    { id: "hall",     name: "Living Hall",      sub: "Carved teak sofas, 7 Horses art & marble floor",   outdoor: false },
+    { id: "midbed",   name: "Middle Bedroom",   sub: "Home Mandir shrine, wardrobes & floral suite",     outdoor: false },
+    { id: "kitchen",  name: "Granite Kitchen",  sub: "Black granite counters & sunny window",            outdoor: false },
+    { id: "bathroom", name: "Marble Bath",      sub: "Black-gold veined marble & chrome fixtures",       outdoor: false },
+    { id: "tanka",    name: "Tanka Courtyard",  sub: "Open-sky courtyard, charpai & desert cooler",      outdoor: true },
+    { id: "terrace",  name: "Roof Terrace",     sub: "Carved sandstone jali parapet & wide sky view",    outdoor: true },
+  ];
+
+  // State
+  let currentRoom = ROOMS[0];
+  let nightMix = 0.0;
+  let targetNight = 0.0;
+  let weather = "sunny"; // sunny | golden | rain
+  let lampLevel = 1.1;   // 0.72 Cozy | 1.1 Warm | 1.38 Festive
+  let timelapse = false;
+  let timelapseDir = 1;
+  let autoPan = false;
+  let fade = 0.0;
+  let targetFade = 0.0;
+  let lightning = 0.0;
+
+  // Camera
+  let yaw = 0.0, pitch = 0.04, fov = 68;
+  let tYaw = 0.0, tPitch = 0.04, tFov = 68;
+  let dragging = false, lastX = 0, lastY = 0;
+  let pinchDist = 0;
+  let lastTapTime = 0;
+
+  // Texture Cache (LRU capped at 4 rooms so low-end 2GB RAM phones NEVER run out of GPU memory!)
+  const texCache = new Map();
+
+  // DOM refs
+  const glCanvas = document.getElementById("gl");
+  const fxCanvas = document.getElementById("fx");
+  const fxCtx = fxCanvas.getContext("2d");
+  const loaderEl = document.getElementById("loader");
+  const loaderText = document.getElementById("loaderText");
+  const hudEl = document.getElementById("hud");
+  const roomTitle = document.getElementById("roomTitle");
+  const roomSub = document.getElementById("roomSub");
+  const moodPill = document.getElementById("moodPill");
+  const nightSlider = document.getElementById("nightSlider");
+  const roomsBar = document.getElementById("roomsBar");
+
+  // --- PURE RAW WEBGL1 ENGINE (2 TRIANGLES = ULTRA FAST ON EVERY LOW-END PHONE!) ---
+  const gl = glCanvas.getContext("webgl", { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: "default" })
+          || glCanvas.getContext("experimental-webgl");
+
+  const VERT_SRC = `
+    attribute vec2 aPos;
+    varying vec2 vNdc;
+    void main() {
+      vNdc = aPos;
+      gl_Position = vec4(aPos, 0.0, 1.0);
+    }
+  `;
+
+  const FRAG_SRC = `
+    precision highp float;
+    varying vec2 vNdc;
+    uniform sampler2D uDayTex;
+    uniform sampler2D uNightTex;
+    uniform float uYaw;
+    uniform float uPitch;
+    uniform float uTanHalfFov;
+    uniform float uAspect;
+    uniform float uNightMix;
+    uniform float uFade;
+    uniform float uTime;
+    uniform float uRainMix;
+    uniform float uGoldenBoost;
+    uniform float uLampGlow;
+    uniform float uIsOutdoor;
+    uniform float uLightning;
+
+    const float PI = 3.14159265359;
+    const vec2 TEXEL = vec2(1.0 / 2048.0, 1.0 / 1024.0);
+
+    float hash3(vec3 p) {
+      p = fract(p * 0.3183099 + 0.1);
+      p *= 17.0;
+      return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+    }
+
+    vec3 sampleCrisp(sampler2D tex, vec2 uv) {
+      vec3 c = texture2D(tex, uv).rgb;
+      vec3 n = texture2D(tex, uv + vec2(0.0, TEXEL.y)).rgb;
+      vec3 s = texture2D(tex, uv - vec2(0.0, TEXEL.y)).rgb;
+      vec3 e = texture2D(tex, uv + vec2(TEXEL.x, 0.0)).rgb;
+      vec3 w = texture2D(tex, uv - vec2(TEXEL.x, 0.0)).rgb;
+      vec3 avg = 0.25 * (n + s + e + w);
+      return clamp(c + (c - avg) * 0.38, 0.0, 1.0);
+    }
+
+    vec3 sampleBloom(sampler2D tex, vec2 uv, float spread) {
+      vec2 s = TEXEL * spread;
+      vec3 acc = vec3(0.0);
+      acc += max(texture2D(tex, uv + vec2( s.x,  0.0)).rgb - 0.62, 0.0);
+      acc += max(texture2D(tex, uv + vec2(-s.x,  0.0)).rgb - 0.62, 0.0);
+      acc += max(texture2D(tex, uv + vec2( 0.0,  s.y)).rgb - 0.62, 0.0);
+      acc += max(texture2D(tex, uv + vec2( 0.0, -s.y)).rgb - 0.62, 0.0);
+      return acc * 0.25;
+    }
+
+    void main() {
+      // Build exact perspective camera ray per pixel (zero sphere tessellation needed!)
+      vec3 ray = normalize(vec3(vNdc.x * uAspect * uTanHalfFov, vNdc.y * uTanHalfFov, -1.0));
+      float cp = cos(uPitch), sp = sin(uPitch);
+      ray = vec3(ray.x, ray.y * cp - ray.z * sp, ray.y * sp + ray.z * cp);
+      float cy = cos(uYaw), sy = sin(uYaw);
+      vec3 d = normalize(vec3(ray.x * cy + ray.z * sy, ray.y, -ray.x * sy + ray.z * cy));
+
+      float u = 0.5 + atan(d.x, -d.z) / (2.0 * PI);
+      float v = 0.5 - asin(clamp(d.y, -1.0, 1.0)) / PI;
+      vec2 uv = vec2(fract(u), clamp(v, 0.002, 0.998));
+
+      vec3 dayC = sampleCrisp(uDayTex, uv);
+      vec3 nightC = sampleCrisp(uNightTex, uv);
+
+      // Exact pixel-accurate Sky Mask from daytime blue sky (stars NEVER touch the house!)
+      float dayLuma = dot(dayC, vec3(0.299, 0.587, 0.114));
+      float blueOverRed = dayC.b - dayC.r;
+      float isBlueSky = smoothstep(-0.01, 0.09, blueOverRed) * smoothstep(0.32, 0.58, dayLuma);
+      float isHighSky = smoothstep(0.78, 0.94, dayLuma) * smoothstep(0.22, 0.42, d.y) * smoothstep(-0.08, 0.02, blueOverRed);
+      float realSkyMask = clamp(max(isBlueSky, isHighSky), 0.0, 1.0) * smoothstep(0.06, 0.20, d.y) * uIsOutdoor;
+      float houseMask = 1.0 - realSkyMask;
+
+      // Brightly Lit Architectural Night House (Hero focus!)
+      vec3 liftedNight = pow(max(nightC, vec3(0.0001)), vec3(0.78)) * mix(1.08, 1.68, uIsOutdoor);
+      float wallGlow = smoothstep(-0.45, 0.30, d.y) * (1.0 - smoothstep(0.25, 0.58, d.y));
+      vec3 warmArch = dayC * mix(vec3(0.42, 0.48, 0.68), vec3(1.18, 0.84, 0.52), 0.42 + 0.52 * wallGlow);
+      vec3 heroNight = mix(liftedNight, max(liftedNight, warmArch * (0.52 + 0.46 * uLampGlow)), uIsOutdoor * 0.78);
+      vec3 indoorNight = nightC * mix(0.68, 1.18, clamp(uLampGlow, 0.5, 1.35)) * vec3(1.06, 0.98, 0.90);
+      vec3 finalNightHouse = mix(indoorNight, heroNight * mix(0.78, 1.24, clamp(uLampGlow, 0.5, 1.35)), uIsOutdoor);
+
+      vec3 deepNightSky = mix(vec3(0.055, 0.085, 0.19), vec3(0.012, 0.022, 0.075), smoothstep(0.05, 0.65, d.y));
+      vec3 finalNight = mix(finalNightHouse, deepNightSky, realSkyMask);
+
+      // Golden Hour Sunset Warmth
+      float duskBell = sin(clamp(uNightMix, 0.0, 1.0) * PI);
+      float goldenStrength = max(duskBell * 0.85, uGoldenBoost * (1.0 - uNightMix * 0.55));
+      vec3 sunsetHouse = dayC * mix(vec3(1.0), vec3(1.16, 0.88, 0.66), goldenStrength * 0.72);
+      vec3 sunsetSky = mix(dayC, mix(vec3(0.98, 0.54, 0.28), vec3(0.24, 0.22, 0.48), smoothstep(0.06, 0.52, d.y)), goldenStrength * 0.82);
+      vec3 finalDay = mix(sunsetHouse, sunsetSky, realSkyMask);
+
+      // Monsoon overcast tint
+      vec3 rainGrade = mix(vec3(1.0), vec3(0.78, 0.84, 0.92), uRainMix * 0.62);
+      finalDay *= rainGrade;
+      finalNight *= mix(vec3(1.0), vec3(0.84, 0.89, 0.98), uRainMix * 0.55);
+
+      float mixT = smoothstep(0.05, 0.95, uNightMix);
+      vec3 col = mix(finalDay, finalNight, mixT);
+
+      // Warm Architectural Lamp Bloom on House
+      vec3 nightBloom = sampleBloom(uNightTex, uv, 14.0) + sampleBloom(uNightTex, uv, 30.0) * 0.6;
+      float pulse = 0.96 + 0.04 * sin(uTime * 3.0 + d.x * 4.0);
+      col += nightBloom * vec3(1.26, 0.86, 0.44) * mixT * uLampGlow * 1.15 * pulse * houseMask;
+
+      // Sky-only Sun Halo, Silver Moon, Stars & Shooting Star!
+      if (realSkyMask > 0.02) {
+        vec3 sunDir = normalize(vec3(0.42, mix(0.45, 0.10, clamp(uNightMix * 1.5, 0.0, 1.0)), -0.82));
+        float sunDot = max(dot(d, sunDir), 0.0);
+        float sunVis = (1.0 - smoothstep(0.50, 0.82, uNightMix)) * (1.0 - uRainMix * 0.85);
+        col += vec3(1.0, 0.68, 0.32) * pow(sunDot, 12.0) * 0.52 * goldenStrength * sunVis * realSkyMask;
+        col += vec3(1.0, 0.94, 0.80) * pow(sunDot, 180.0) * 1.15 * sunVis * realSkyMask;
+
+        if (uNightMix > 0.45 && uRainMix < 0.75) {
+          float nightSkyVis = smoothstep(0.45, 0.86, uNightMix) * (1.0 - uRainMix);
+          vec3 moonDir = normalize(vec3(-0.32, 0.46, -0.82));
+          float moonDot = max(dot(d, moonDir), 0.0);
+          col += vec3(0.75, 0.86, 1.0) * pow(moonDot, 20.0) * 0.30 * nightSkyVis * realSkyMask;
+          col += vec3(0.98, 0.99, 1.0) * pow(moonDot, 600.0) * 1.8 * nightSkyVis * realSkyMask;
+
+          vec3 cell = floor(d * 300.0);
+          float r = hash3(cell);
+          float tw = 0.55 + 0.45 * sin(uTime * (2.0 + r * 3.6) + r * 60.0);
+          float star = step(0.9964, r) * tw * nightSkyVis * realSkyMask;
+          col += mix(vec3(0.82, 0.90, 1.0), vec3(1.0, 0.94, 0.80), fract(r * 13.7)) * star * 1.2;
+
+          float mc = mod(uTime * 0.22, 1.0);
+          if (mc < 0.16) {
+            float mt = mc / 0.16;
+            vec2 mPos = vec2(0.22 + mt * 0.34, 0.22 + mt * 0.11);
+            vec2 delta = vec2(u, v) - mPos;
+            float along = dot(delta, normalize(vec2(-0.94, -0.34)));
+            float perp = abs(dot(delta, normalize(vec2(-0.34, 0.94))));
+            float streak = smoothstep(0.0035, 0.0, perp) * smoothstep(0.0, 0.075, along) * smoothstep(0.10, 0.0, along);
+            col += vec3(1.0, 0.97, 0.88) * streak * (1.0 - mt) * nightSkyVis * realSkyMask * 1.7;
+          }
+        }
+      }
+
+      if (uLightning > 0.01) {
+        col += vec3(0.76, 0.86, 1.0) * uLightning * mix(0.14, 0.48, realSkyMask);
+      }
+
+      gl_FragColor = vec4(clamp(col, 0.0, 1.0) * uFade, 1.0);
+    }
+  `;
+
+  function compile(type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    return sh;
+  }
+
+  let prog, uLoc = {};
+  if (gl) {
+    prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT_SRC));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG_SRC));
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+    const aPos = gl.getAttribLocation(prog, "aPos");
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    ["uDayTex","uNightTex","uYaw","uPitch","uTanHalfFov","uAspect","uNightMix","uFade","uTime","uRainMix","uGoldenBoost","uLampGlow","uIsOutdoor","uLightning"]
+      .forEach((n) => (uLoc[n] = gl.getUniformLocation(prog, n)));
+  }
+
+  function makeTex(img) {
+    const t = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    return t;
+  }
+
+  function loadImg(url) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+  }
+
+  let activeDayTex = null, activeNightTex = null;
+  let loadSeq = 0;
+
+  async function selectRoom(room) {
+    const seq = ++loadSeq;
+    currentRoom = room;
+    roomTitle.textContent = room.name;
+    roomSub.textContent = room.sub;
+    document.querySelectorAll(".room-btn").forEach((b) => b.classList.toggle("active", b.dataset.id === room.id));
+
+    if (texCache.has(room.id)) {
+      const entry = texCache.get(room.id);
+      activeDayTex = entry.day;
+      activeNightTex = entry.night;
+      targetFade = 1.0;
+      loaderEl.classList.add("done");
+      return;
+    }
+
+    loaderText.textContent = `Loading ${room.name}…`;
+    loaderEl.classList.remove("done");
+    targetFade = 0.2;
+
+    const [dayImg, nightImg] = await Promise.all([
+      loadImg(`./panoramas/day/${room.id}.webp`),
+      loadImg(`./panoramas/night/${room.id}.webp`),
+    ]);
+    if (seq !== loadSeq || !gl) return;
+
+    const dTex = makeTex(dayImg || nightImg);
+    const nTex = makeTex(nightImg || dayImg);
+
+    // Keep max 4 rooms cached to stay ultra-light on 2GB RAM budget phones!
+    if (texCache.size >= 4) {
+      const oldestKey = texCache.keys().next().value;
+      const old = texCache.get(oldestKey);
+      gl.deleteTexture(old.day);
+      gl.deleteTexture(old.night);
+      texCache.delete(oldestKey);
+    }
+    texCache.set(room.id, { day: dTex, night: nTex });
+    activeDayTex = dTex;
+    activeNightTex = nTex;
+    targetFade = 1.0;
+    loaderEl.classList.add("done");
+  }
+
+  // --- SOFT 2D CANVAS ATMOSPHERE OVERLAY (TINY GLOWING FIREFLY ORBS & SILKY MONSOON RAIN!) ---
+  const fireflies = Array.from({ length: 24 }, () => ({
+    x: Math.random(), y: 0.25 + Math.random() * 0.65,
+    vx: (Math.random() - 0.5) * 0.014, vy: (Math.random() - 0.5) * 0.01,
+    r: 2.2 + Math.random() * 2.8, ph: Math.random() * Math.PI * 2,
+  }));
+  const raindrops = Array.from({ length: 90 }, () => ({
+    x: Math.random(), y: Math.random(), len: 12 + Math.random() * 18, spd: 0.8 + Math.random() * 0.7,
+  }));
+
+  function drawFx(dt, t) {
+    const w = fxCanvas.width, h = fxCanvas.height;
+    fxCtx.clearRect(0, 0, w, h);
+
+    if (weather === "rain") {
+      fxCtx.strokeStyle = currentRoom.outdoor ? "rgba(210, 232, 255, 0.42)" : "rgba(210, 232, 255, 0.14)";
+      fxCtx.lineWidth = 1.25;
+      fxCtx.beginPath();
+      for (const r of raindrops) {
+        r.y += r.spd * dt;
+        r.x -= 0.08 * dt;
+        if (r.y > 1.05) { r.y = -0.05; r.x = Math.random(); }
+        if (r.x < -0.05) r.x = 1.05;
+        const px = r.x * w, py = r.y * h;
+        fxCtx.moveTo(px, py);
+        fxCtx.lineTo(px - 2.5, py + r.len);
+      }
+      fxCtx.stroke();
+      return;
+    }
+
+    // Delicate soft glowing firefly orbs at night OR subtle sunlit dust motes in golden hour
+    const isNight = nightMix > 0.48;
+    const vis = isNight ? (nightMix - 0.48) * 1.45 * (currentRoom.outdoor ? 0.85 : 0.35)
+                        : (weather === "golden" ? 0.42 : 0.16);
+    if (vis < 0.04) return;
+
+    for (const f of fireflies) {
+      f.x = (f.x + f.vx * dt + 1) % 1;
+      f.y = Math.max(0.18, Math.min(0.88, f.y + f.vy * dt + Math.sin(t * 1.4 + f.ph) * 0.0004));
+      const pulse = 0.55 + 0.45 * Math.sin(t * 2.6 + f.ph);
+      const px = f.x * w, py = f.y * h;
+      const rad = f.r * (isNight ? 2.4 : 1.7);
+      const grad = fxCtx.createRadialGradient(px, py, 0, px, py, rad);
+      const alpha = (vis * pulse).toFixed(3);
+      grad.addColorStop(0, isNight ? `rgba(255,246,196,${alpha})` : `rgba(255,244,214,${alpha})`);
+      grad.addColorStop(0.4, isNight ? `rgba(251,191,36,${(vis * pulse * 0.45).toFixed(3)})` : `rgba(253,224,155,${(vis * pulse * 0.3).toFixed(3)})`);
+      grad.addColorStop(1, "rgba(251,191,36,0)");
+      fxCtx.fillStyle = grad;
+      fxCtx.beginPath();
+      fxCtx.arc(px, py, rad, 0, Math.PI * 2);
+      fxCtx.fill();
+    }
+  }
+
+  // --- OPTIONAL LIGHTWEIGHT OFFLINE AMBIENT SOUND ---
+  let audioOn = false, actx = null, rainGain = null, breezeGain = null;
+  function toggleAudio() {
+    audioOn = !audioOn;
+    document.getElementById("btnAudio").textContent = audioOn ? "🔊" : "🔇";
+    document.getElementById("btnAudio").classList.toggle("active", audioOn);
+    if (audioOn && !actx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      actx = new AC();
+      const len = actx.sampleRate * 2;
+      const buf = actx.createBuffer(1, len, actx.sampleRate);
+      const d = buf.getChannelData(0);
+      let b0=0,b1=0,b2=0;
+      for (let i=0;i<len;i++){ const w=Math.random()*2-1; b0=0.997*b0+w*0.04; b1=0.985*b1+w*0.08; b2=0.95*b2+w*0.14; d[i]=(b0+b1+b2)*0.08; }
+      const s1 = actx.createBufferSource(); s1.buffer = buf; s1.loop = true;
+      const f1 = actx.createBiquadFilter(); f1.type = "lowpass"; f1.frequency.value = 380;
+      breezeGain = actx.createGain(); breezeGain.gain.value = 0.25;
+      s1.connect(f1).connect(breezeGain).connect(actx.destination); s1.start();
+
+      const s2 = actx.createBufferSource(); s2.buffer = buf; s2.loop = true;
+      const f2 = actx.createBiquadFilter(); f2.type = "bandpass"; f2.frequency.value = 1400;
+      rainGain = actx.createGain(); rainGain.gain.value = 0;
+      s2.connect(f2).connect(rainGain).connect(actx.destination); s2.start();
+    }
+    if (actx) {
+      if (audioOn && actx.state === "suspended") actx.resume();
+      updateAudioLevels();
+    }
+  }
+  function updateAudioLevels() {
+    if (!actx || !breezeGain || !rainGain) return;
+    const now = actx.currentTime;
+    breezeGain.gain.setTargetAtTime(audioOn ? (currentRoom.outdoor ? 0.25 : 0.08) : 0, now, 0.3);
+    rainGain.gain.setTargetAtTime(audioOn && weather === "rain" ? (currentRoom.outdoor ? 0.48 : 0.20) : 0, now, 0.35);
+  }
+
+  // --- UI BUILD & EVENTS ---
+  ROOMS.forEach((r) => {
+    const btn = document.createElement("button");
+    btn.className = "room-btn" + (r.id === currentRoom.id ? " active" : "");
+    btn.dataset.id = r.id;
+    btn.textContent = r.name;
+    btn.onclick = () => { selectRoom(r); updateAudioLevels(); };
+    roomsBar.appendChild(btn);
+  });
+
+  function syncMoodUI() {
+    nightSlider.value = targetNight.toFixed(2);
+    const isDay = targetNight < 0.22;
+    const isSun = targetNight >= 0.22 && targetNight < 0.65;
+    const isNit = targetNight >= 0.65;
+    document.getElementById("btnDay").className = "pill" + (isDay ? " on-day" : "");
+    document.getElementById("btnSunset").className = "pill" + (isSun ? " on-sunset" : "");
+    document.getElementById("btnNight").className = "pill" + (isNit ? " on-night" : "");
+    moodPill.textContent = isDay ? "Bright Day" : isSun ? "Golden Sunset" : "Lit Starry Night";
+  }
+
+  document.getElementById("btnDay").onclick = () => { timelapse = false; targetNight = 0.0; syncMoodUI(); syncTimelapseBtn(); };
+  document.getElementById("btnSunset").onclick = () => { timelapse = false; targetNight = 0.42; syncMoodUI(); syncTimelapseBtn(); };
+  document.getElementById("btnNight").onclick = () => { timelapse = false; targetNight = 1.0; syncMoodUI(); syncTimelapseBtn(); };
+  nightSlider.oninput = (e) => { timelapse = false; targetNight = parseFloat(e.target.value); syncMoodUI(); syncTimelapseBtn(); };
+
+  function syncTimelapseBtn() {
+    const b = document.getElementById("btnTimelapse");
+    b.textContent = timelapse ? "⏸ Cycle" : "▶ Cycle";
+    b.className = "pill" + (timelapse ? " on-day" : "");
+  }
+  document.getElementById("btnTimelapse").onclick = () => { timelapse = !timelapse; syncTimelapseBtn(); };
+
+  function setWx(w) {
+    weather = w;
+    document.getElementById("wxClear").className = "pill" + (w === "sunny" ? " on-wx" : "");
+    document.getElementById("wxGolden").className = "pill" + (w === "golden" ? " on-wx" : "");
+    document.getElementById("wxRain").className = "pill" + (w === "rain" ? " on-wx" : "");
+    updateAudioLevels();
+  }
+  document.getElementById("wxClear").onclick = () => setWx("sunny");
+  document.getElementById("wxGolden").onclick = () => setWx("golden");
+  document.getElementById("wxRain").onclick = () => setWx("rain");
+
+  const btnLights = document.getElementById("btnLights");
+  btnLights.onclick = () => {
+    if (lampLevel > 1.25) { lampLevel = 0.72; btnLights.textContent = "💡 Cozy"; }
+    else if (lampLevel < 0.85) { lampLevel = 1.1; btnLights.textContent = "💡 Warm"; }
+    else { lampLevel = 1.38; btnLights.textContent = "💡 Festive"; }
+  };
+
+  const btnPan = document.getElementById("btnPan");
+  btnPan.onclick = () => { autoPan = !autoPan; btnPan.classList.toggle("active", autoPan); };
+  document.getElementById("btnAudio").onclick = toggleAudio;
+  document.getElementById("btnHide").onclick = () => hudEl.classList.toggle("hidden-ui");
+
+  // --- TOUCH & MOUSE CONTROLS (DRAG + PINCH ZOOM + DOUBLE-TAP RESET) ---
+  glCanvas.addEventListener("pointerdown", (e) => {
+    dragging = true; lastX = e.clientX; lastY = e.clientY;
+    const now = performance.now();
+    if (now - lastTapTime < 280) { tFov = 68; tPitch = 0.04; }
+    lastTapTime = now;
+  });
+  window.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    const dx = e.clientX - lastX, dy = e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    const sens = e.pointerType === "touch" ? 0.0044 : 0.0032;
+    tYaw -= dx * sens;
+    tPitch = Math.max(-1.15, Math.min(1.15, tPitch + dy * sens));
+  });
+  window.addEventListener("pointerup", () => (dragging = false));
+
+  glCanvas.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    tFov = Math.max(38, Math.min(90, tFov + e.deltaY * 0.04));
+  }, { passive: false });
+
+  glCanvas.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 2) {
+      dragging = false;
+      pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    }
+  }, { passive: true });
+  glCanvas.addEventListener("touchmove", (e) => {
+    if (e.touches.length === 2 && pinchDist > 0) {
+      const nd = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      tFov = Math.max(38, Math.min(90, tFov - (nd - pinchDist) * 0.12));
+      pinchDist = nd;
+    }
+  }, { passive: true });
+  glCanvas.addEventListener("touchend", () => { pinchDist = 0; });
+
+  // --- RESPONSIVE DPR (Capped at 1.5 on phones so low-end GPUs stay locked at 60 FPS!) ---
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const w = Math.floor(window.innerWidth * dpr);
+    const h = Math.floor(window.innerHeight * dpr);
+    if (glCanvas.width !== w || glCanvas.height !== h) {
+      glCanvas.width = w; glCanvas.height = h;
+      fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight;
+      if (gl) gl.viewport(0, 0, w, h);
+    }
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  // --- RENDER LOOP ---
+  let lastT = performance.now();
+  let curRain = 0, curGold = 0, curLamp = 1.1;
+
+  function frame(now) {
+    const dt = Math.min((now - lastT) / 1000, 0.05);
+    lastT = now;
+    const t = now * 0.001;
+
+    if (timelapse) {
+      targetNight += timelapseDir * dt * 0.09;
+      if (targetNight >= 1) { targetNight = 1; timelapseDir = -1; }
+      else if (targetNight <= 0) { targetNight = 0; timelapseDir = 1; }
+      syncMoodUI();
+    }
+
+    if (autoPan && !dragging) tYaw += dt * 0.06;
+
+    const k = 1 - Math.exp(-9 * dt);
+    yaw += (tYaw - yaw) * k;
+    pitch += (tPitch - pitch) * k;
+    fov += (tFov - fov) * k;
+    nightMix += (targetNight - nightMix) * (1 - Math.exp(-6 * dt));
+    fade += (targetFade - fade) * (1 - Math.exp(-8 * dt));
+    curRain += ((weather === "rain" ? 1 : 0) - curRain) * (1 - Math.exp(-4 * dt));
+    curGold += ((weather === "golden" ? 1 : 0) - curGold) * (1 - Math.exp(-4 * dt));
+    curLamp += (lampLevel - curLamp) * (1 - Math.exp(-7 * dt));
+
+    if (weather === "rain" && Math.random() < dt * 0.14) lightning = 0.85;
+    lightning = Math.max(0, lightning - dt * 3.8);
+
+    if (gl && activeDayTex && activeNightTex) {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, activeDayTex);
+      gl.uniform1i(uLoc.uDayTex, 0);
+
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, activeNightTex);
+      gl.uniform1i(uLoc.uNightTex, 1);
+
+      gl.uniform1f(uLoc.uYaw, yaw);
+      gl.uniform1f(uLoc.uPitch, pitch);
+      gl.uniform1f(uLoc.uTanHalfFov, Math.tan((fov * Math.PI) / 360));
+      gl.uniform1f(uLoc.uAspect, glCanvas.width / Math.max(1, glCanvas.height));
+      gl.uniform1f(uLoc.uNightMix, nightMix);
+      gl.uniform1f(uLoc.uFade, fade);
+      gl.uniform1f(uLoc.uTime, t);
+      gl.uniform1f(uLoc.uRainMix, curRain);
+      gl.uniform1f(uLoc.uGoldenBoost, curGold);
+      gl.uniform1f(uLoc.uLampGlow, curLamp);
+      gl.uniform1f(uLoc.uIsOutdoor, currentRoom.outdoor ? 1.0 : 0.0);
+      gl.uniform1f(uLoc.uLightning, lightning);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    drawFx(dt, t);
+    requestAnimationFrame(frame);
+  }
+
+  selectRoom(ROOMS[0]);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
